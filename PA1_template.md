@@ -1,15 +1,10 @@
----
-title: 'Reproducible Research: Peer Assessment 1'
-output:
-  html_document:
-    keep_md: yes
-  pdf_document: default
----
+# Reproducible Research: Peer Assessment 1
 
 
   
 ## Loading and preprocessing the data
-```{r, echo=TRUE}
+
+```r
   # Set the working directory
 
   library(dplyr,quietly=TRUE, warn.conflicts = FALSE, verbose=FALSE)
@@ -24,43 +19,42 @@ output:
   
   daily <- summarise( group_by(activity, date), steps=sum(steps))
   by.interval <- summarise( group_by(activity,interval), mean.steps=mean(steps))
-  
-  
 ```
 
 ## What is mean total number of steps taken per day?
 
 #### 1) Make a histogram of the total number of steps taken each day
-```{r, echo=TRUE}
 
- 
+```r
   qplot(daily$steps, geom="histogram", binwidth=1000, main="Histogram for Daily Step Count", xlab="Steps", ylab="Count")
- 
-
-  
-
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)\
 
 
 #### 2) Calculate and report the mean and median total number of steps taken per day
 
 #####a) Mean
 
-```{r, echo=TRUE}
- 
- mean(daily$steps)
-  
 
+```r
+ mean(daily$steps)
+```
+
+```
+## [1] 10766.19
 ```
 
 
 #####b) Median
 
-```{r, echo=TRUE}
 
+```r
  median(daily$steps)
-  
+```
 
+```
+## [1] 10765
 ```
 
 
@@ -70,18 +64,23 @@ output:
 
 #####1) Make a histogram of the total number of steps taken each day
 
-```{r, echo=TRUE}
+
+```r
 qplot( interval, mean.steps, data=by.interval, geom="line", xlab="Interval",ylab="Mean Steps") 
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-5-1.png)\
 
 
 #####2) Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-```{r, echo=TRUE}
 
+```r
      by.interval$interval[by.interval$mean.steps==max(by.interval$mean.steps)]
-  
-  
+```
+
+```
+## [1] 835
 ```
 
 
@@ -91,11 +90,13 @@ qplot( interval, mean.steps, data=by.interval, geom="line", xlab="Interval",ylab
 #####1) Calculate and report the total number of missing values in the dataset(i.e. the total number of rows with NAS)
 
 
-```{r, echo=TRUE}
 
+```r
   sum( is.na(activity.file$steps)  )
-  
-  
+```
+
+```
+## [1] 2304
 ```
 
 
@@ -110,12 +111,9 @@ qplot( interval, mean.steps, data=by.interval, geom="line", xlab="Interval",ylab
 
 
 
-```{r, echo=TRUE}
 
-
+```r
 the.mean.to.fill <- mean(activity$steps)
-
-  
 ```
 
 
@@ -127,13 +125,10 @@ the.mean.to.fill <- mean(activity$steps)
 
 
 
-```{r, echo=TRUE}
 
+```r
 activity.filled <- activity.file
 activity.filled[is.na(activity.filled$steps),"steps"] <- the.mean.to.fill
-
-
-  
 ```
 
 
@@ -144,14 +139,14 @@ activity.filled[is.na(activity.filled$steps),"steps"] <- the.mean.to.fill
 
 
 
-```{r, echo=TRUE}
 
+```r
  daily.filled <- summarise( group_by(activity.filled, date), steps=sum(steps)) 
 
   qplot(daily.filled$steps, geom="histogram", binwidth=1000, main="Histogram for Daily Step Count (Filled NA's)", xlab="Steps", ylab="Count") 
- 
-  
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png)\
 
 
 #####In shape there is no difference between this histogram and the previous one. 
@@ -165,17 +160,13 @@ activity.filled[is.na(activity.filled$steps),"steps"] <- the.mean.to.fill
 
 #####1 Create a new factor variable in the dataset with two levels "weekday" and "weekend" indicating whether a given date is a weekday or weekend day
 
-```{r, echo=TRUE}
-  
-  
+
+```r
   we <- mutate( subset( activity,  as.POSIXlt(date)$wday ==1 | as.POSIXlt(date)$wday==7),daytype=as.factor("WEEKEND"))
   
   wd <- mutate( subset( activity,  as.POSIXlt(date)$wday >=2 | as.POSIXlt(date)$wday<=6), daytype=as.factor("WEEKDAY"))
   
   alldays <- summarise( group_by(rbind(we,wd),daytype, interval ), steps=mean(steps)) 
-
-  
-                        
 ```
 
 
@@ -185,22 +176,22 @@ activity.filled[is.na(activity.filled$steps),"steps"] <- the.mean.to.fill
 #####2 Make a panel plot containing a time series plot of the 5-minute interval(x-axis) and the average number of steps taken, averaged acrosss all weekday days or weekend days (y axis).
 
 
-```{r, echo=TRUE}
 
+```r
   qplot(interval, steps,  data=alldays,  geom="line", facets =daytype~., color=daytype,main="Comparison Between Weekdays and Weekends")
-  
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-12-1.png)\
 
 
 ###### The same comparison
 
 
-```{r, echo=TRUE}
 
-  
+```r
   qplot(interval, steps,  data=alldays,  geom="line", color =daytype, main="Comparison Between Weekdays and Weekends")
- 
-  
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-13-1.png)\
 
 
